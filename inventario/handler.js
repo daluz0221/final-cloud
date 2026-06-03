@@ -17,6 +17,18 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 app.use(express.json());
+const LOCAL_ALLOWED_ORIGIN = "http://localhost:5173";
+const ALLOWED_ORIGIN = "https://d2m7470idjwjir.cloudfront.net";
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 function isValidCantidad(value) {
   return Number.isInteger(value) && value >= 0;
@@ -25,6 +37,8 @@ function isValidCantidad(value) {
 function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
+
+
 
 // GET /productos — listar todos
 app.get("/productos", async (req, res) => {
